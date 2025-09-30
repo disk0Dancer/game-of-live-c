@@ -15,9 +15,15 @@ Implemented Game of live GUI simulation, source code available at dir [sim_app](
 Run application from root directory with command:
 
 ```bash
-make sim-up
+make run
 ```
 
 Demo:
 
 ![demo1](pics/game-of-live-demo.gif)
+
+Generate IR from sources with:
+
+```bash
+make ir
+```
