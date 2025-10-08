@@ -1,9 +1,5 @@
 #include "sim.h"
-#include <SDL.h>
 #include <string.h>
-
-static int cur[GRID_W * GRID_H];
-static int nxt[GRID_W * GRID_H];
 
 static int idx(int x, int y) { return y * GRID_W + x; }
 
@@ -33,12 +29,12 @@ static void step_generation(int *dst, const int *src) {
     }
 }
 
-static void randomize(int permill) {
+static void randomize(int *cur, int permill) {
     for (int i = 0; i < GRID_W * GRID_H; ++i)
         cur[i] = ((simRand() % 1000) < permill) ? 1 : 0;
 }
 
-static void clear_all(void) { memset(cur, 0, sizeof(cur)); }
+static void clear_all(int *cur) { memset(cur, 0, GRID_W * GRID_H * sizeof(int)); }
 
 static void draw_cell(int cx, int cy, int argb) {
     int px = cx * CELL_SIZE;
@@ -48,7 +44,7 @@ static void draw_cell(int cx, int cy, int argb) {
             simPutPixel(px + xx, py + yy, argb);
 }
 
-static void draw_frame(void) {
+static void draw_frame(const int *cur) {
     const int ALIVE = 0xFFFFFFFF;
     const int DEAD = 0xFF000000;
     for (int y = 0; y < GRID_H; ++y)
@@ -57,10 +53,12 @@ static void draw_frame(void) {
 }
 
 void app(void) {
-    clear_all();
-    randomize(180);
+    int cur[GRID_W * GRID_H];
+    int nxt[GRID_W * GRID_H];
+    clear_all(cur);
+    randomize(cur, 180);
     for (int step = 0; step < 1000; ++step) {
-        draw_frame();
+        draw_frame(cur);
         simFlush();
         step_generation(nxt, cur);
         for (int i = 0; i < GRID_W * GRID_H; ++i) {
@@ -68,14 +66,3 @@ void app(void) {
         }
     }
 }
-
-// void app() {
-//     for (int step = 0; step < 1000; ++step) {
-//         for (int y = 0; y < SIM_Y_SIZE; ++y) {
-//             for (int x = 0; x < SIM_X_SIZE; ++x) {
-//                 simPutPixel(x, y, 0xff0000 + x * y * step);
-//             }
-//         }
-//         simFlush();
-//     }
-// }
