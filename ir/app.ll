@@ -1,165 +1,180 @@
 ; ModuleID = 'sim_app/app.c'
 source_filename = "sim_app/app.c"
-target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128-Fn32"
 target triple = "arm64-apple-macosx15.0.0"
-
-@nxt = internal global [16384 x i32] zeroinitializer, align 4
-@cur = internal global [16384 x i32] zeroinitializer, align 4
 
 ; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
 define void @app() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  call void @clear_all()
-  call void @randomize(i32 noundef 180)
-  store i32 0, ptr %1, align 4
-  br label %3
-
-3:                                                ; preds = %22, %0
-  %4 = load i32, ptr %1, align 4
-  %5 = icmp slt i32 %4, 1000
-  br i1 %5, label %6, label %25
-
-6:                                                ; preds = %3
-  call void @draw_frame()
-  call void @simFlush()
-  call void @step_generation(ptr noundef @nxt, ptr noundef @cur)
-  store i32 0, ptr %2, align 4
-  br label %7
-
-7:                                                ; preds = %18, %6
-  %8 = load i32, ptr %2, align 4
-  %9 = icmp slt i32 %8, 16384
-  br i1 %9, label %10, label %21
-
-10:                                               ; preds = %7
-  %11 = load i32, ptr %2, align 4
-  %12 = sext i32 %11 to i64
-  %13 = getelementptr inbounds [16384 x i32], ptr @nxt, i64 0, i64 %12
-  %14 = load i32, ptr %13, align 4
-  %15 = load i32, ptr %2, align 4
-  %16 = sext i32 %15 to i64
-  %17 = getelementptr inbounds [16384 x i32], ptr @cur, i64 0, i64 %16
-  store i32 %14, ptr %17, align 4
-  br label %18
-
-18:                                               ; preds = %10
-  %19 = load i32, ptr %2, align 4
-  %20 = add nsw i32 %19, 1
-  store i32 %20, ptr %2, align 4
-  br label %7, !llvm.loop !6
-
-21:                                               ; preds = %7
-  br label %22
-
-22:                                               ; preds = %21
-  %23 = load i32, ptr %1, align 4
-  %24 = add nsw i32 %23, 1
-  store i32 %24, ptr %1, align 4
-  br label %3, !llvm.loop !8
-
-25:                                               ; preds = %3
-  ret void
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define internal void @clear_all() #0 {
-  call void @llvm.memset.p0.i64(ptr align 4 @cur, i8 0, i64 65536, i1 false)
-  ret void
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define internal void @randomize(i32 noundef %0) #0 {
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  store i32 %0, ptr %2, align 4
-  store i32 0, ptr %3, align 4
-  br label %4
-
-4:                                                ; preds = %17, %1
-  %5 = load i32, ptr %3, align 4
-  %6 = icmp slt i32 %5, 16384
-  br i1 %6, label %7, label %20
-
-7:                                                ; preds = %4
-  %8 = call i32 @simRand()
-  %9 = srem i32 %8, 1000
-  %10 = load i32, ptr %2, align 4
-  %11 = icmp slt i32 %9, %10
-  %12 = zext i1 %11 to i64
-  %13 = select i1 %11, i32 1, i32 0
-  %14 = load i32, ptr %3, align 4
-  %15 = sext i32 %14 to i64
-  %16 = getelementptr inbounds [16384 x i32], ptr @cur, i64 0, i64 %15
-  store i32 %13, ptr %16, align 4
-  br label %17
-
-17:                                               ; preds = %7
-  %18 = load i32, ptr %3, align 4
-  %19 = add nsw i32 %18, 1
-  store i32 %19, ptr %3, align 4
-  br label %4, !llvm.loop !9
-
-20:                                               ; preds = %4
-  ret void
-}
-
-; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
-define internal void @draw_frame() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
+  %1 = alloca [16384 x i32], align 4
+  %2 = alloca [16384 x i32], align 4
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
-  store i32 -1, ptr %1, align 4
-  store i32 -16777216, ptr %2, align 4
+  %5 = getelementptr inbounds [16384 x i32], ptr %1, i64 0, i64 0
+  call void @clear_all(ptr noundef %5)
+  %6 = getelementptr inbounds [16384 x i32], ptr %1, i64 0, i64 0
+  call void @randomize(ptr noundef %6, i32 noundef 180)
   store i32 0, ptr %3, align 4
-  br label %5
+  br label %7
 
-5:                                                ; preds = %28, %0
-  %6 = load i32, ptr %3, align 4
-  %7 = icmp slt i32 %6, 128
-  br i1 %7, label %8, label %31
+7:                                                ; preds = %29, %0
+  %8 = load i32, ptr %3, align 4
+  %9 = icmp slt i32 %8, 1000
+  br i1 %9, label %10, label %32
 
-8:                                                ; preds = %5
+10:                                               ; preds = %7
+  %11 = getelementptr inbounds [16384 x i32], ptr %1, i64 0, i64 0
+  call void @draw_frame(ptr noundef %11)
+  call void @simFlush()
+  %12 = getelementptr inbounds [16384 x i32], ptr %2, i64 0, i64 0
+  %13 = getelementptr inbounds [16384 x i32], ptr %1, i64 0, i64 0
+  call void @step_generation(ptr noundef %12, ptr noundef %13)
   store i32 0, ptr %4, align 4
-  br label %9
+  br label %14
 
-9:                                                ; preds = %24, %8
-  %10 = load i32, ptr %4, align 4
-  %11 = icmp slt i32 %10, 128
-  br i1 %11, label %12, label %27
-
-12:                                               ; preds = %9
-  %13 = load i32, ptr %4, align 4
-  %14 = load i32, ptr %3, align 4
+14:                                               ; preds = %25, %10
   %15 = load i32, ptr %4, align 4
-  %16 = load i32, ptr %3, align 4
-  %17 = call i32 @idx(i32 noundef %15, i32 noundef %16)
+  %16 = icmp slt i32 %15, 16384
+  br i1 %16, label %17, label %28
+
+17:                                               ; preds = %14
+  %18 = load i32, ptr %4, align 4
+  %19 = sext i32 %18 to i64
+  %20 = getelementptr inbounds [16384 x i32], ptr %2, i64 0, i64 %19
+  %21 = load i32, ptr %20, align 4
+  %22 = load i32, ptr %4, align 4
+  %23 = sext i32 %22 to i64
+  %24 = getelementptr inbounds [16384 x i32], ptr %1, i64 0, i64 %23
+  store i32 %21, ptr %24, align 4
+  br label %25
+
+25:                                               ; preds = %17
+  %26 = load i32, ptr %4, align 4
+  %27 = add nsw i32 %26, 1
+  store i32 %27, ptr %4, align 4
+  br label %14, !llvm.loop !6
+
+28:                                               ; preds = %14
+  br label %29
+
+29:                                               ; preds = %28
+  %30 = load i32, ptr %3, align 4
+  %31 = add nsw i32 %30, 1
+  store i32 %31, ptr %3, align 4
+  br label %7, !llvm.loop !8
+
+32:                                               ; preds = %7
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define internal void @clear_all(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  store ptr %0, ptr %2, align 8
+  %3 = load ptr, ptr %2, align 8
+  %4 = load ptr, ptr %2, align 8
+  %5 = call i64 @llvm.objectsize.i64.p0(ptr %4, i1 false, i1 true, i1 false)
+  %6 = call ptr @__memset_chk(ptr noundef %3, i32 noundef 0, i64 noundef 65536, i64 noundef %5) #4
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define internal void @randomize(ptr noundef %0, i32 noundef %1) #0 {
+  %3 = alloca ptr, align 8
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
+  store ptr %0, ptr %3, align 8
+  store i32 %1, ptr %4, align 4
+  store i32 0, ptr %5, align 4
+  br label %6
+
+6:                                                ; preds = %20, %2
+  %7 = load i32, ptr %5, align 4
+  %8 = icmp slt i32 %7, 16384
+  br i1 %8, label %9, label %23
+
+9:                                                ; preds = %6
+  %10 = call i32 @simRand()
+  %11 = srem i32 %10, 1000
+  %12 = load i32, ptr %4, align 4
+  %13 = icmp slt i32 %11, %12
+  %14 = zext i1 %13 to i64
+  %15 = select i1 %13, i32 1, i32 0
+  %16 = load ptr, ptr %3, align 8
+  %17 = load i32, ptr %5, align 4
   %18 = sext i32 %17 to i64
-  %19 = getelementptr inbounds [16384 x i32], ptr @cur, i64 0, i64 %18
-  %20 = load i32, ptr %19, align 4
-  %21 = icmp ne i32 %20, 0
-  %22 = zext i1 %21 to i64
-  %23 = select i1 %21, i32 -1, i32 -16777216
-  call void @draw_cell(i32 noundef %13, i32 noundef %14, i32 noundef %23)
-  br label %24
+  %19 = getelementptr inbounds i32, ptr %16, i64 %18
+  store i32 %15, ptr %19, align 4
+  br label %20
 
-24:                                               ; preds = %12
-  %25 = load i32, ptr %4, align 4
-  %26 = add nsw i32 %25, 1
-  store i32 %26, ptr %4, align 4
-  br label %9, !llvm.loop !10
+20:                                               ; preds = %9
+  %21 = load i32, ptr %5, align 4
+  %22 = add nsw i32 %21, 1
+  store i32 %22, ptr %5, align 4
+  br label %6, !llvm.loop !9
 
-27:                                               ; preds = %9
-  br label %28
+23:                                               ; preds = %6
+  ret void
+}
 
-28:                                               ; preds = %27
-  %29 = load i32, ptr %3, align 4
-  %30 = add nsw i32 %29, 1
-  store i32 %30, ptr %3, align 4
-  br label %5, !llvm.loop !11
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define internal void @draw_frame(ptr noundef %0) #0 {
+  %2 = alloca ptr, align 8
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
+  %6 = alloca i32, align 4
+  store ptr %0, ptr %2, align 8
+  store i32 -1, ptr %3, align 4
+  store i32 -16777216, ptr %4, align 4
+  store i32 0, ptr %5, align 4
+  br label %7
 
-31:                                               ; preds = %5
+7:                                                ; preds = %31, %1
+  %8 = load i32, ptr %5, align 4
+  %9 = icmp slt i32 %8, 128
+  br i1 %9, label %10, label %34
+
+10:                                               ; preds = %7
+  store i32 0, ptr %6, align 4
+  br label %11
+
+11:                                               ; preds = %27, %10
+  %12 = load i32, ptr %6, align 4
+  %13 = icmp slt i32 %12, 128
+  br i1 %13, label %14, label %30
+
+14:                                               ; preds = %11
+  %15 = load i32, ptr %6, align 4
+  %16 = load i32, ptr %5, align 4
+  %17 = load ptr, ptr %2, align 8
+  %18 = load i32, ptr %6, align 4
+  %19 = load i32, ptr %5, align 4
+  %20 = call i32 @idx(i32 noundef %18, i32 noundef %19)
+  %21 = sext i32 %20 to i64
+  %22 = getelementptr inbounds i32, ptr %17, i64 %21
+  %23 = load i32, ptr %22, align 4
+  %24 = icmp ne i32 %23, 0
+  %25 = zext i1 %24 to i64
+  %26 = select i1 %24, i32 -1, i32 -16777216
+  call void @draw_cell(i32 noundef %15, i32 noundef %16, i32 noundef %26)
+  br label %27
+
+27:                                               ; preds = %14
+  %28 = load i32, ptr %6, align 4
+  %29 = add nsw i32 %28, 1
+  store i32 %29, ptr %6, align 4
+  br label %11, !llvm.loop !10
+
+30:                                               ; preds = %11
+  br label %31
+
+31:                                               ; preds = %30
+  %32 = load i32, ptr %5, align 4
+  %33 = add nsw i32 %32, 1
+  store i32 %33, ptr %5, align 4
+  br label %7, !llvm.loop !11
+
+34:                                               ; preds = %7
   ret void
 }
 
@@ -266,8 +281,11 @@ define internal void @step_generation(ptr noundef %0, ptr noundef %1) #0 {
   ret void
 }
 
-; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: write)
-declare void @llvm.memset.p0.i64(ptr nocapture writeonly, i8, i64, i1 immarg) #2
+; Function Attrs: nounwind
+declare ptr @__memset_chk(ptr noundef, i32 noundef, i64 noundef, i64 noundef) #2
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare i64 @llvm.objectsize.i64.p0(ptr, i1 immarg, i1 immarg, i1 immarg) #3
 
 declare i32 @simRand(...) #1
 
@@ -486,19 +504,21 @@ define internal i32 @wrap(i32 noundef %0, i32 noundef %1) #0 {
   ret i32 %23
 }
 
-attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+lse,+neon,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
-attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+lse,+neon,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
-attributes #2 = { nocallback nofree nounwind willreturn memory(argmem: write) }
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+bti,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+bti,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #2 = { nounwind "frame-pointer"="non-leaf" "no-trapping-math"="true" "probe-stack"="__chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+altnzcv,+bti,+ccdp,+ccidx,+complxnum,+crc,+dit,+dotprod,+flagm,+fp-armv8,+fp16fml,+fptoint,+fullfp16,+jsconv,+lse,+neon,+pauth,+perfmon,+predres,+ras,+rcpc,+rdm,+sb,+sha2,+sha3,+specrestrict,+ssbs,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #3 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #4 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}
 
-!0 = !{i32 2, !"SDK Version", [2 x i32] [i32 15, i32 2]}
+!0 = !{i32 2, !"SDK Version", [2 x i32] [i32 26, i32 0]}
 !1 = !{i32 1, !"wchar_size", i32 4}
 !2 = !{i32 8, !"PIC Level", i32 2}
 !3 = !{i32 7, !"uwtable", i32 1}
 !4 = !{i32 7, !"frame-pointer", i32 1}
-!5 = !{!"Apple clang version 16.0.0 (clang-1600.0.26.6)"}
+!5 = !{!"Apple clang version 17.0.0 (clang-1700.3.19.1)"}
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
 !8 = distinct !{!8, !7}

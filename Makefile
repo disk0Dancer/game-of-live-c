@@ -1,4 +1,4 @@
-.PHONY: build run step clean fmt
+.PHONY: build run clean fmt ir logger pass
 
 SRC_DIR := sim_app
 SRCS := $(wildcard $(SRC_DIR)/*.c)
@@ -18,18 +18,22 @@ run: build
 
 ir:
 	mkdir -p $(IR_DIR)
-	for f in $(SRCS); do \
-	  base=$$(basename $$f .c); \
-	  clang -E $$f $(CFLAGS) > $(IR_DIR)/$$base.i; \
-	  clang -S $$f $(CFLAGS) -o $(IR_DIR)/$$base.s; \
-	  clang -S -emit-llvm $$f $(CFLAGS) -o $(IR_DIR)/$$base.ll; \
-	  clang -c -emit-llvm $$f $(CFLAGS) -o $(IR_DIR)/$$base.bc; \
-	  clang -c $$f $(CFLAGS) -o $(IR_DIR)/$$base.o; \
-	done
-	clang $(SRCS) -o $(IR_DIR)/app $(CFLAGS) $(LDFLAGS)
+	clang -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app.ll
+	clang -O1 -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app_O1.ll
+	clang -O2 -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app_O2.ll
+	clang -O3 -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app_O3.ll
+	clang -Os -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app_Os.ll
+
+logger:
+	clang -c runtime_logger.c -o runtime_logger.o
+
+pass: logger
+	clang++ -shared -fPIC Pass_instrumentation.cpp -o libpass.so \
+		`/opt/homebrew/opt/llvm/bin/llvm-config --cxxflags --ldflags --libs core passes` -undefined dynamic_lookup
 
 clean:
-	rm -rf $(BUILD_DIR) $(IR_DIR)
+	rm -rf $(BUILD_DIR) $(IR_DIR) *.o *.so
+	rm -f trace.txt relations.txt
 
 fmt:
 	clang-format -i $(SRC_DIR)/*.c $(SRC_DIR)/*.h
