@@ -16,7 +16,7 @@ build:
 run: build
 	./$(APP)
 
-ir:
+ir: build
 	mkdir -p $(IR_DIR)
 	clang -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app.ll
 	clang -O1 -S -emit-llvm $(SRC_DIR)/app.c $(CFLAGS) -o $(IR_DIR)/app_O1.ll
@@ -28,12 +28,13 @@ logger:
 	clang -c runtime_logger.c -o runtime_logger.o
 
 pass: logger
-	clang++ -shared -fPIC Pass_instrumentation.cpp -o libpass.so \
+	clang++ -shared -fPIC MyPass.cpp -o libpass.so \
 		`/opt/homebrew/opt/llvm/bin/llvm-config --cxxflags --ldflags --libs core passes` -undefined dynamic_lookup
 
-clean:
-	rm -rf $(BUILD_DIR) $(IR_DIR) *.o *.so
-	rm -f trace.txt relations.txt
+pass.apply: pass ir
+	clang -fpass-plugin=./libpass.so -O1 $(SRC_DIR)/app.c $(SRC_DIR)/sim.c $(SRC_DIR)/start.c runtime_logger.o $(CFLAGS) $(LDFLAGS) -o my_app
+	./my_app
 
-fmt:
-	clang-format -i $(SRC_DIR)/*.c $(SRC_DIR)/*.h
+clean:
+	rm -f trace.txt relations.txt
+	rm -rf $(BUILD_DIR) $(IR_DIR) *.o *.so my_app

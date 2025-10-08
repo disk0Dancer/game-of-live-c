@@ -1,3 +1,5 @@
 .idea/
 build/
 books/
+*.so
+*.o
