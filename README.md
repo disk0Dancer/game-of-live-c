@@ -42,6 +42,10 @@ make ir
 make collect.traces
 ```
 
+```bash
+python3 analyze_stats.py > stats/summary.txt
+```
+
 [See stats/](stats/)
 
 ## LAB 3
