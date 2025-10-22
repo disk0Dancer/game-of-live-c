@@ -3,3 +3,7 @@ build/
 books/
 *.so
 *.o
+llvm_cource/
+ir/
+irgen_app/app_ir_gen
+my_app
