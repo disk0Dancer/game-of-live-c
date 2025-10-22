@@ -32,11 +32,6 @@ pass: logger
 	clang++ -shared -fPIC MyPass.cpp -o libpass.so \
 		`/opt/homebrew/opt/llvm/bin/llvm-config --cxxflags --ldflags --libs core passes` -undefined dynamic_lookup
 
-pass.apply: pass ir
-	clang -fpass-plugin=./libpass.so -O1 $(SRC_DIR)/app.c $(SRC_DIR)/sim.c $(SRC_DIR)/start.c runtime_logger.o $(CFLAGS) $(LDFLAGS) -o my_app
-	./my_app
-
-# Collect traces for different optimization levels
 LLVM_CLANG := /opt/homebrew/opt/llvm/bin/clang
 
 collect.traces: pass ir

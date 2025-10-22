@@ -39,5 +39,19 @@ make ir
 ```
 
 ```bash
-make pass
+make collect.traces
 ```
+
+[See stats/](stats/)
+
+## LAB 3
+
+```md
+Третье задание (до 22.10 23:59):
+Написать (либо сгенерировать) IR генератор графического приложения
++ подключить интерпретацию с пробросом графических функций в ExecutionEngine.
+Код IR генератора выложить в репозиторий.
+Пример генератора: https://github.com/lisitsynSA/llvm_course/blob/main/SDL/IRGen/app_ir_gen.cpp
+```
+
+IR generator located at [ir_gen/](ir_gen/)

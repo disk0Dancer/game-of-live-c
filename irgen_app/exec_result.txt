@@ -1,0 +1,90 @@
+; ModuleID = 'app.c'
+source_filename = "app.c"
+
+declare void @simPutPixel(i32, i32, i32)
+
+declare void @simFlush()
+
+declare i32 @simRand()
+
+define void @app() {
+entry:
+  br label %loop.frame
+
+loop.frame:                                       ; preds = %loop.frame.end, %entry
+  %frame = phi i32 [ 0, %entry ], [ %14, %loop.frame.end ]
+  %0 = icmp slt i32 %frame, 500
+  br i1 %0, label %loop.frame.body, label %exit
+
+loop.frame.body:                                  ; preds = %loop.frame
+  br label %loop.y
+
+loop.y:                                           ; preds = %loop.x.end, %loop.frame.body
+  %y = phi i32 [ 0, %loop.frame.body ], [ %13, %loop.x.end ]
+  %1 = icmp slt i32 %y, 128
+  br i1 %1, label %loop.y.body, label %loop.y.end
+
+loop.y.body:                                      ; preds = %loop.y
+  br label %loop.x
+
+loop.x:                                           ; preds = %cell.loop.y.end, %loop.y.body
+  %x = phi i32 [ 0, %loop.y.body ], [ %21, %cell.loop.y.end ]
+  %2 = icmp slt i32 %x, 128
+  br i1 %2, label %loop.x.body, label %loop.x.end
+
+loop.x.body:                                      ; preds = %loop.x
+  %3 = mul i32 %x, 4
+  %4 = mul i32 %y, 4
+  %5 = xor i32 %x, %y
+  %6 = xor i32 %5, %frame
+  %7 = and i32 %6, 255
+  %8 = shl i32 %7, 16
+  %9 = shl i32 %7, 8
+  %10 = or i32 -16777216, %8
+  %11 = or i32 %10, %9
+  %12 = or i32 %11, %7
+  br label %cell.loop.y
+
+loop.x.end:                                       ; preds = %loop.x
+  %13 = add i32 %y, 1
+  br label %loop.y
+
+loop.y.end:                                       ; preds = %loop.y
+  call void @simFlush()
+  br label %loop.frame.end
+
+loop.frame.end:                                   ; preds = %loop.y.end
+  %14 = add i32 %frame, 1
+  br label %loop.frame
+
+exit:                                             ; preds = %loop.frame
+  ret void
+
+cell.loop.y:                                      ; preds = %cell.loop.x.end, %loop.x.body
+  %cell.y = phi i32 [ 0, %loop.x.body ], [ %20, %cell.loop.x.end ]
+  %15 = icmp slt i32 %cell.y, 4
+  br i1 %15, label %cell.loop.y.body, label %cell.loop.y.end
+
+cell.loop.y.body:                                 ; preds = %cell.loop.y
+  br label %cell.loop.x
+
+cell.loop.x:                                      ; preds = %cell.loop.x.body, %cell.loop.y.body
+  %cell.x = phi i32 [ 0, %cell.loop.y.body ], [ %19, %cell.loop.x.body ]
+  %16 = icmp slt i32 %cell.x, 4
+  br i1 %16, label %cell.loop.x.body, label %cell.loop.x.end
+
+cell.loop.x.body:                                 ; preds = %cell.loop.x
+  %17 = add i32 %3, %cell.x
+  %18 = add i32 %4, %cell.y
+  call void @simPutPixel(i32 %17, i32 %18, i32 %12)
+  %19 = add i32 %cell.x, 1
+  br label %cell.loop.x
+
+cell.loop.x.end:                                  ; preds = %cell.loop.x
+  %20 = add i32 %cell.y, 1
+  br label %cell.loop.y
+
+cell.loop.y.end:                                  ; preds = %cell.loop.y
+  %21 = add i32 %x, 1
+  br label %loop.x
+}
