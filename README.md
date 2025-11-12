@@ -59,3 +59,22 @@ python3 analyze_stats.py > stats/summary.txt
 ```
 
 IR generator located at [ir_gen/](ir_gen/)
+
+## LAB 4
+
+```md
+Четвертое задание (до 12.11 23:59): 
+1) Свой набор инструкций из статистики для ASM и LLVM IR вашего приложения (описание инструкций выложить в репозиторий) 
+2) Переписать приложение на ASM (скинуть в репозиторий)
+ 
+Написать ASM2IR генератор: 
+3) С вызовами эмулирующих функций (кроме инструкций потока управления) 
+4) С генерацией IR эквивалентов для всех инструкций
+
+Примеры:
+2) https://github.com/lisitsynSA/llvm_course/blob/main/SDL/IRGen/app.s
+3) https://github.com/lisitsynSA/llvm_course/blob/main/SDL/IRGen/app_asm_IRgen_1.cpp
+4) https://github.com/lisitsynSA/llvm_course/blob/main/SDL/IRGen/app_asm_IRgen_2.cpp
+```
+
+Check ASM [description](asm2ir/README.md) and ASM-to-IR generators.
